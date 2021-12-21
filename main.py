@@ -23,41 +23,46 @@ BALL_VELOCIY = 10
 THROW_BALL = (WIDTH/2, HEIGHT-BALL_RADIUS)
 
 balls_center = []
-balls_color = []
 colors = [RED,PURPLE,CYAN,BLUE,YELLOW]
 
 def intialize_data():
-    generate_ball_positions()
-    define_ball_colors()
+    generate_level_rect_grid()
+    generate_balls_map()
 
-def generate_ball_positions():
-    row_len = [5,6,9,10,11,10,9,6,5]
-    for i in range(len(row_len)):
-        balls_row = [(None,None)] * row_len[i]
-        x_indent = (max(row_len) - row_len[i] + 1) * BALL_RADIUS
-        y_indent  = BALL_RADIUS - i* 7
-        for j in range(row_len[i]):
-            balls_row[j] = (x_indent + 2 * j * BALL_RADIUS, y_indent + 2 * i * BALL_RADIUS)
+def generate_level_rect_grid(): # generate all the possible positions on the map for the bubbles
+    row_len = 11
+    row_height = 13
+    for i in range(row_height):
+        balls_row= [[None, None, None, None, None]] * (row_len - i%2) # empty/not empty, circle.x, circle.y, color, pygame.rect
+        indent_x = (i%2+1) * BALL_RADIUS
+        indent_y = BALL_RADIUS - i * 7
+        for j in range(len(balls_row)):
+            balls_row[j] = [0, indent_x + 2* j * BALL_RADIUS, indent_y + 2* i * BALL_RADIUS, None, None]
         balls_center.append(balls_row)
 
-def define_ball_colors():
-    row_len = [5,6,9,10,11,10,9,6,5]
+def generate_balls_map():
+    row_len = [5,6,9,10,11,10,9,6,5] # the starting map layout
     for i in range(len(row_len)):
-        balls_row_color = [(None,None)] * row_len[i]
-        for j in range(row_len[i]):
-            balls_row_color[j] = random.choice(colors)
-        balls_color.append(balls_row_color)
+        first_pos = (len(balls_center[i]) - row_len[i])//2
+        for j in range (row_len[i]):
+            balls_center[i][first_pos+j][0] = 1 # not empty
+            balls_center[i][first_pos+j][3] = random.choice(colors) # set a color
+            #create a rectangle aroun the bubble for collision
+            aux_rect = pygame.Rect(balls_center[i][first_pos+j][1] - BALL_RADIUS, balls_center[i][first_pos+j][2] - BALL_RADIUS, 2 * BALL_RADIUS, 2* BALL_RADIUS)
+            balls_center[i][first_pos+j][4] = aux_rect
+
 
 def draw_map_balls():
     for i in range(len(balls_center)):
         for j in range(len(balls_center[i])):
-            pygame.draw.circle(GAME_WINDOW, balls_color[i][j], balls_center[i][j], BALL_RADIUS)
-            pygame.draw.circle(GAME_WINDOW, GRAY, balls_center[i][j], BALL_RADIUS,width=1)
+            if balls_center[i][j][0] == 1:
+                pygame.draw.circle(GAME_WINDOW, balls_center[i][j][3],(balls_center[i][j][1], balls_center[i][j][2]), BALL_RADIUS)
+                pygame.draw.circle(GAME_WINDOW, GRAY, (balls_center[i][j][1], balls_center[i][j][2]), BALL_RADIUS,width=1)
 
 
 def draw_window(throwing_bubble_rect):
     GAME_WINDOW.fill(WHITE)
-    #draw_map_balls()
+    draw_map_balls()
     pygame.draw.circle(GAME_WINDOW, RED,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS)
     pygame.draw.circle(GAME_WINDOW, GRAY,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS,width=1)
     pygame.display.update()
