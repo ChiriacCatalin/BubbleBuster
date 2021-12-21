@@ -1,1 +1,2 @@
-+ BALL_RADIUS * ((i+1) %2)
+if pos:
+            throwing_bubble.y -= BALL_VELOCIY
