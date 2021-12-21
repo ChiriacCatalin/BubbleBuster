@@ -1,0 +1,1 @@
++ BALL_RADIUS * ((i+1) %2)
