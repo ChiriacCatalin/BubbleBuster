@@ -55,11 +55,11 @@ def draw_map_balls():
             pygame.draw.circle(GAME_WINDOW, GRAY, balls_center[i][j], BALL_RADIUS,width=1)
 
 
-def draw_window(throwing_bubble):
+def draw_window(throwing_bubble_rect):
     GAME_WINDOW.fill(WHITE)
     #draw_map_balls()
-    pygame.draw.circle(GAME_WINDOW, RED,(throwing_bubble.x + BALL_RADIUS, throwing_bubble.y+BALL_RADIUS), BALL_RADIUS)
-    pygame.draw.circle(GAME_WINDOW, GRAY,(throwing_bubble.x + BALL_RADIUS, throwing_bubble.y+BALL_RADIUS), BALL_RADIUS,width=1)
+    pygame.draw.circle(GAME_WINDOW, RED,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS)
+    pygame.draw.circle(GAME_WINDOW, GRAY,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS,width=1)
     pygame.display.update()
 
 def ball_angle(p1, p2):
@@ -72,35 +72,45 @@ def next_ball_position(init_pos, angle):
     new_y = init_pos[1] - BALL_VELOCIY * math.sin(math.radians(angle))
     return (new_x, new_y)
 
+
+
+def throw_the_bubble(pos, throwing_bubble_rect, angle, exact_position):
+    (exact_position[0], exact_position[1]) = next_ball_position(exact_position, angle)
+    (throwing_bubble_rect.x, throwing_bubble_rect.y) = (int(exact_position[0]),int(exact_position[1])) # update the positon of the ball
+
+    # change angle on collision with the right or left margin
+    if throwing_bubble_rect.x + 2 * BALL_RADIUS >= WIDTH or throwing_bubble_rect.x <=0:
+        angle = 180 - angle
+    if throwing_bubble_rect.y < 0:
+        throwing_bubble_rect.x = WIDTH/2-BALL_RADIUS
+        throwing_bubble_rect.y = HEIGHT-2*BALL_RADIUS
+        return -1
+    return angle
+
+
 def main():
     intialize_data()
     clock = pygame.time.Clock()
 
-    throwing_bubble = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
+    throwing_bubble_rect = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
     game_running = True
     pos = (None,None)
+    angle = -1
     while game_running:
         clock.tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_running = False
                 pygame.quit()
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and angle < 0:
                 pos = pygame.mouse.get_pos()
-                angle = ball_angle(THROW_BALL,pos)
-                exact_position = [throwing_bubble.x, throwing_bubble.y]
-                print(angle, pos)
-
-        if pos != (None,None) and angle > 0:
-            (exact_position[0], exact_position[1]) = next_ball_position(exact_position, angle)
-            (throwing_bubble.x, throwing_bubble.y) = (int(exact_position[0]),int(exact_position[1]))
-            print(throwing_bubble.x +BALL_RADIUS, throwing_bubble.y +BALL_RADIUS, pos)
-
-            if throwing_bubble.x > WIDTH or throwing_bubble.y < pos[1] - 2*BALL_RADIUS:
-                throwing_bubble.x = WIDTH/2-BALL_RADIUS
-                throwing_bubble.y = HEIGHT-2*BALL_RADIUS
-                angle = -1
-        draw_window(throwing_bubble)
+                angle = ball_angle(THROW_BALL,pos) # get the angle between the center of the bubble and the clicked area
+                exact_position = [throwing_bubble_rect.x, throwing_bubble_rect.y] # the float value of the position
+            
+        if angle > 0:# throw the ball
+            angle = throw_the_bubble(pos, throwing_bubble_rect, angle, exact_position)
+            
+        draw_window(throwing_bubble_rect)
 
 
 
