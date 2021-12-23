@@ -60,10 +60,10 @@ def draw_map_balls():
                 pygame.draw.circle(GAME_WINDOW, GRAY, (balls_center[i][j][1], balls_center[i][j][2]), BALL_RADIUS,width=1)
 
 
-def draw_window(throwing_bubble_rect):
+def draw_window(throwing_bubble_rect, bubble_color):
     GAME_WINDOW.fill(WHITE)
     draw_map_balls()
-    pygame.draw.circle(GAME_WINDOW, RED,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS)
+    pygame.draw.circle(GAME_WINDOW, bubble_color,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS)
     pygame.draw.circle(GAME_WINDOW, GRAY,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS,width=1)
     pygame.display.update()
 
@@ -120,9 +120,10 @@ def threat_collision_point(throwed_ball_rect, i, j, color = BLACK):
 
 
     if line == 0 and col == 0:
-        print(throwed_ball_rect, balls_center[i][j][4])
-    print(line, col)
-    add_bubble_to_map(line, col)
+        print("Error:",throwed_ball_rect, balls_center[i][j][4])
+   # print(line, col)
+    add_bubble_to_map(line, col, color)
+    return(line, col)
 
 
 def check_clear_position(i, j):
@@ -136,21 +137,54 @@ def add_bubble_to_map(line, col, color = BLACK):
     aux_rect = pygame.Rect(balls_center[line][col][1] - BALL_RADIUS, balls_center[line][col][2] - BALL_RADIUS, 2 * BALL_RADIUS, 2* BALL_RADIUS)
     balls_center[line][col][4] = aux_rect
 
-def check_collision(throwed_ball_rect): # check if the throwed ball colides with any other ball, or the top of the screen
+def check_collision(throwed_ball_rect, color = BLACK): # check if the throwed ball colides with any other ball, or the top of the screen
     for i in range(len(balls_center)):
         for j in range(len(balls_center[i])):
             if balls_center[i][j][4] != None:
                 if throwed_ball_rect.colliderect(balls_center[i][j][4]):
-                    threat_collision_point(throwed_ball_rect, i, j)
-                    return 1
-    return 0
+                    (i,j) = threat_collision_point(throwed_ball_rect, i, j, color)
+                    #print(i,j)
+                    return (i,j)
+    return (0,0)
 
+
+def break_bubbles(i, j):
+    neighbours_short_line = [(0,1), (0,-1), (1, 0), (1,1),(-1,0),(-1,1)]
+    neighbours_long_line = [(0,1), (0,-1), (1,0),(1,-1),(-1,0),(-1,-1)] #extra checking for out of bounds
+    tail = [(i,j)]
+    head = 0
+    while head < len(tail):
+        current = tail[head]
+        if current[0] % 2 == 0: # if it's a line with more bubbles
+            for x in range(len(neighbours_long_line)):
+                new_line = tail[head][0] + neighbours_long_line[x][0]
+                new_col = tail[head][1] + neighbours_long_line[x][1]
+                if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
+                    if balls_center[new_line][new_col][3] == balls_center[i][j][3] and (new_line, new_col) not in tail: # and if they have the same color
+                        tail.append((new_line, new_col))
+        else:  # if it's a line with less bubbles
+            for x in range(len(neighbours_short_line)):
+                new_line = tail[head][0] + neighbours_short_line[x][0]
+                new_col = tail[head][1] + neighbours_short_line[x][1]
+                if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
+                    if balls_center[new_line][new_col][3] == balls_center[i][j][3] and (new_line, new_col) not in tail: # and if they have the same color
+                        tail.append((new_line, new_col))
+        head +=1
+    if len(tail) > 2:
+        delete_bubbles(tail)
+
+def delete_bubbles(bubbles):
+    for i in range(len(bubbles)):
+        balls_center[bubbles[i][0]][bubbles[i][1]][0] = 0
+        balls_center[bubbles[i][0]][bubbles[i][1]][3] = None
+        balls_center[bubbles[i][0]][bubbles[i][1]][4] = None
 
 def main():
     intialize_data()
     clock = pygame.time.Clock()
 
     throwing_bubble_rect = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
+    bubble_color = random.choice(colors)
     game_running = True
     pos = (None,None)
     angle = -1
@@ -167,12 +201,15 @@ def main():
             
         if angle > 0:# throw the ball
             angle = throw_the_bubble(pos, throwing_bubble_rect, angle, exact_position)
-
-        if check_collision(throwing_bubble_rect) == 1:
+        
+        inserted_bubble = check_collision(throwing_bubble_rect, bubble_color)
+        if inserted_bubble != (0,0):
+            break_bubbles(inserted_bubble[0], inserted_bubble[1])
             throwing_bubble_rect = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
+            bubble_color = random.choice(colors)
             angle = -1
             
-        draw_window(throwing_bubble_rect)
+        draw_window(throwing_bubble_rect, bubble_color)
 
 
 
