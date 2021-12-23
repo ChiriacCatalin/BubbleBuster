@@ -106,7 +106,7 @@ def threat_collision_point(throwed_ball_rect, i, j, color = BLACK):
                 col = j
         else: # if the bubble should be placed down, on the right side 
             if i % 2 == 0: # if its a line with more bubbles per line(12 instead of 11)
-                col = min (j, len(balls_center[i])-1)
+                col = min (j, len(balls_center[i])-2)
             else: # if its a line with less bubbles per line
                 col = j+1
     # if the bubble should be placed on the left side 
@@ -121,6 +121,7 @@ def threat_collision_point(throwed_ball_rect, i, j, color = BLACK):
 
     if line == 0 and col == 0:
         print(throwed_ball_rect, balls_center[i][j][4])
+    print(line, col)
     add_bubble_to_map(line, col)
 
 
