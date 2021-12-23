@@ -97,13 +97,12 @@ def throw_the_bubble(pos, throwing_bubble_rect, angle, exact_position):
         return -1
     return angle
 
-def threat_collision_point(throwed_ball_rect, i, j, color = BLACK):
-    collision_tolerance = BALL_VELOCIY + 1
+def threat_collision_point(throwed_ball, i, j, color = BLACK):
     line = col = 0
     # if the bubble collides with the bottom of another bubble
-    if abs(throwed_ball_rect.top - balls_center[i][j][4].bottom) < collision_tolerance:
+    if abs(throwed_ball[1] - balls_center[i][j][2]) < 2*BALL_RADIUS:
         line = i+1
-        if (throwed_ball_rect.x - balls_center[i][j][4].x) < 0: # if the bubble should be placed down, on the left side 
+        if (throwed_ball[0] - balls_center[i][j][1]) < 0: # if the bubble should be placed down, on the left side 
             if i % 2 == 0: # if its a line with more bubbles per line(12 instead of 11)
                 col = max(j-1, 0)
             else: # if its a line with less bubbles per line
@@ -113,19 +112,20 @@ def threat_collision_point(throwed_ball_rect, i, j, color = BLACK):
                 col = min (j, len(balls_center[i])-2)
             else: # if its a line with less bubbles per line
                 col = j+1
+   
     # if the bubble should be placed on the left side 
-    if abs(throwed_ball_rect.right - balls_center[i][j][4].left) < collision_tolerance and check_clear_position(i, j-1):
+    if throwed_ball[0] - balls_center[i][j][1] <  -BALL_RADIUS and check_clear_position(i, j-1):
         line = i
         col = j-1
     # if the bubble should be placed on the right side 
-    if abs(throwed_ball_rect.left - balls_center[i][j][4].right) < collision_tolerance and check_clear_position(i, j+1):
+    if throwed_ball[0] - balls_center[i][j][1] > BALL_RADIUS and check_clear_position(i, j+1):
         line = i
         col = j+1
 
 
     if line == 0 and col == 0:
-        print("Error:",throwed_ball_rect, balls_center[i][j][4])
-   # print(line, col)
+        print("Error:",throwed_ball, balls_center[i][j][4])
+    #print("WTF", line, col)
     add_bubble_to_map(line, col, color)
     return(line, col)
 
@@ -141,14 +141,22 @@ def add_bubble_to_map(line, col, color = BLACK):
     aux_rect = pygame.Rect(balls_center[line][col][1] - BALL_RADIUS, balls_center[line][col][2] - BALL_RADIUS, 2 * BALL_RADIUS, 2* BALL_RADIUS)
     balls_center[line][col][4] = aux_rect
 
+def get_euclidian_distance(throwed_ball, ball_center):
+    return (math.sqrt((throwed_ball[0] - ball_center[1])**2 + (throwed_ball[1] - ball_center[2])**2))
+
 def check_collision(throwed_ball_rect, color = BLACK): # check if the throwed ball colides with any other ball, or the top of the screen
+    bubble_center = (throwed_ball_rect.x + BALL_RADIUS, throwed_ball_rect.y + BALL_RADIUS)
     for i in range(len(balls_center)):
         for j in range(len(balls_center[i])):
-            if balls_center[i][j][4] != None:
-                if throwed_ball_rect.colliderect(balls_center[i][j][4]):
-                    (i,j) = threat_collision_point(throwed_ball_rect, i, j, color)
-                    #print(i,j)
+            if balls_center[i][j][0] == 1:
+                if get_euclidian_distance(bubble_center, balls_center[i][j]) < 2* BALL_RADIUS:
+                    (i,j) = threat_collision_point(bubble_center, i, j, color)
                     return (i,j)
+            # if balls_center[i][j][4] != None:
+            #     if throwed_ball_rect.colliderect(balls_center[i][j][4]):
+            #         (i,j) = threat_collision_point(throwed_ball_rect, i, j, color)
+            #         #print(i,j)
+            #         return (i,j)
     return (0,0)
 
 
@@ -217,10 +225,12 @@ def remove_floating_bubbles():
             if balls_center[i][j][0] ==1 and (i,j) not in tail:
                 to_remove.append((i,j))
     delete_bubbles(to_remove)
+
+
+
 def main():
     intialize_data()
     clock = pygame.time.Clock()
-
     throwing_bubble_rect = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
     bubble_color = random.choice(colors)
     game_running = True
