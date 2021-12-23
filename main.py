@@ -96,15 +96,31 @@ def throw_the_bubble(pos, throwing_bubble_rect, angle, exact_position):
 def threat_collision_point(throwed_ball_rect, i, j, color = BLACK):
     collision_tolerance = BALL_VELOCIY + 1
     line = col = 0
-    if abs(throwed_ball_rect.top - balls_center[i][j][4].bottom) < collision_tolerance and check_clear_position(i+1, j): # if the bubble collides with the bottom of another bubble
+    # if the bubble collides with the bottom of another bubble
+    if abs(throwed_ball_rect.top - balls_center[i][j][4].bottom) < collision_tolerance:
         line = i+1
-        col = j
+        if (throwed_ball_rect.x - balls_center[i][j][4].x) < 0: # if the bubble should be placed down, on the left side 
+            if i % 2 == 0: # if its a line with more bubbles per line(12 instead of 11)
+                col = max(j-1, 0)
+            else: # if its a line with less bubbles per line
+                col = j
+        else: # if the bubble should be placed down, on the right side 
+            if i % 2 == 0: # if its a line with more bubbles per line(12 instead of 11)
+                col = min (j, len(balls_center[i])-1)
+            else: # if its a line with less bubbles per line
+                col = j+1
+    # if the bubble should be placed on the left side 
     if abs(throwed_ball_rect.right - balls_center[i][j][4].left) < collision_tolerance and check_clear_position(i, j-1):
         line = i
         col = j-1
+    # if the bubble should be placed on the right side 
     if abs(throwed_ball_rect.left - balls_center[i][j][4].right) < collision_tolerance and check_clear_position(i, j+1):
         line = i
         col = j+1
+
+
+    if line == 0 and col == 0:
+        print(throwed_ball_rect, balls_center[i][j][4])
     add_bubble_to_map(line, col)
 
 
