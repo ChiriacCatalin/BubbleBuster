@@ -24,7 +24,7 @@ def break_bubbles(i, j):
             for x in range(len(neighbours_long_line)):
                 new_line = tail[head][0] + neighbours_long_line[x][0]
                 new_col = tail[head][1] + neighbours_long_line[x][1]
-                if new_line < len(balls_center):
+                if new_line < len(balls_center) and new_line >= 0:
                     if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
                         if balls_center[new_line][new_col][3] == balls_center[i][j][3] and (new_line, new_col) not in tail: # and if they have the same color
                             tail.append((new_line, new_col))
@@ -32,7 +32,7 @@ def break_bubbles(i, j):
             for x in range(len(neighbours_short_line)):
                 new_line = tail[head][0] + neighbours_short_line[x][0]
                 new_col = tail[head][1] + neighbours_short_line[x][1]
-                if new_line < len(balls_center):
+                if new_line < len(balls_center) and new_line >= 0:
                     if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
                         if balls_center[new_line][new_col][3] == balls_center[i][j][3] and (new_line, new_col) not in tail: # and if they have the same color
                             tail.append((new_line, new_col))
@@ -68,7 +68,7 @@ def remove_floating_bubbles():
             for x in range(len(neighbours_long_line)):
                 new_line = tail[head][0] + neighbours_long_line[x][0]
                 new_col = tail[head][1] + neighbours_long_line[x][1]
-                if new_line < len(balls_center):
+                if new_line < len(balls_center) and new_line >= 0:
                     if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
                         if balls_center[new_line][new_col][0] == 1 and (new_line, new_col) not in tail: # and if they have the same color
                             tail.append((new_line, new_col))
@@ -77,7 +77,7 @@ def remove_floating_bubbles():
             for x in range(len(neighbours_short_line)):
                 new_line = tail[head][0] + neighbours_short_line[x][0]
                 new_col = tail[head][1] + neighbours_short_line[x][1]
-                if new_line < len(balls_center):
+                if new_line < len(balls_center) and new_line >= 0:
                     if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
                         if balls_center[new_line][new_col][0] == 1 and (new_line, new_col) not in tail: # and if they have the same color
                             tail.append((new_line, new_col))

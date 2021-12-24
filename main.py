@@ -9,8 +9,7 @@ def intialize_data():
     generate_level_rect_grid()
     generate_balls_map()
 
-def main():
-    intialize_data()
+def run_game():
     clock = pygame.time.Clock()
     throwing_bubble_rect = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
     bubble_color = random.choice(list(available_colors))
@@ -42,6 +41,15 @@ def main():
             angle = -1
         
         draw_window(throwing_bubble_rect, bubble_color, next_bubble_color)
+        if inserted_bubble == (-1,-1): # if I lost the game
+            reset_global_data()
+            pygame.event.clear()
+            main()
+
+def main():
+    allocate_mem()
+    intialize_data()
+    run_game()
 
 
 if __name__ == "__main__":
