@@ -18,7 +18,7 @@ def draw_setting_menu(throwing_bubble_rect, next_bubble_color):
     pygame.draw.circle(GAME_WINDOW, GRAY,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS,width=1)
 
 
-def draw_window(throwing_bubble_rect, bubble_color, next_bubble_color, status):
+def draw_window(throwing_bubble_rect, bubble_color, next_bubble_color, status, level):
     GAME_WINDOW.fill(WHITE)
     GAME_WINDOW.blit(background_image, (0,0))
 
@@ -30,7 +30,10 @@ def draw_window(throwing_bubble_rect, bubble_color, next_bubble_color, status):
         result_text[0] = "You Won"
     if result_text[0] != "":
         result = RESULT_FONT.render(result_text[0], 1, GREEN)
-        GAME_WINDOW.blit(result,((WIDTH - result.get_width())/2, (HEIGHT - SETTINGS_SPACE - result.get_height())/2))
+        level_text =  RESULT_FONT.render("Level " + str(level), 1, GREEN)
+        heigh = (HEIGHT - SETTINGS_SPACE - result.get_height())/2
+        GAME_WINDOW.blit(result,((WIDTH - result.get_width())/2, heigh))
+        GAME_WINDOW.blit(level_text,((WIDTH - level_text.get_width())/2, (heigh+ level_text.get_height()+20)))
         
 
     pygame.draw.circle(GAME_WINDOW, bubble_color,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS)

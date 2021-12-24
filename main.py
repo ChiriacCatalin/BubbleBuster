@@ -45,11 +45,12 @@ def run_game(level):
                 next_bubble_color = random.choice(list(available_colors))
                 angle = -1
 
-        draw_window(throwing_bubble_rect, bubble_color, next_bubble_color, status)
+        draw_window(throwing_bubble_rect, bubble_color, next_bubble_color, status, level)
+
         if inserted_bubble == (-1,-1): # if I lost the game
             reset_global_data(status, level)
             pygame.event.clear()
-            main()
+            main(1)
         if status == 'Finnish': # if i won the game/level
             reset_global_data(status, level)
             pygame.event.clear()

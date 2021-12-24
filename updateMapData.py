@@ -6,7 +6,7 @@ import pygame
 def add_bubble_to_map(line, col, color):
     #print("Eroare aici", line, col, len(balls_center), balls_center[line][col])
     if line == len(balls_center):
-        print("here")
+        #print("here")
         result_text[0] = "You Lost!"
     else:
         balls_center[line][col][0] = 1
