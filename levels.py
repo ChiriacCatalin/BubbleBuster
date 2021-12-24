@@ -1,6 +1,5 @@
 from globalData import *
 import random
-import pygame
 
 def generate_level_rect_grid(): # generate all the possible positions on the map for the bubbles
     row_len = 11

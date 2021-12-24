@@ -1,4 +1,5 @@
-score = [0]
+from globalData import score
+
 score_values_for_identical_color = [50,100,200,300,450, 650, 850, 1100] # score for breaking 3-10 bubbles
 # after those add 250 for each extra
 score_values_for_random_color = [5, 10, 25, 50, 75, 100, 150] # score for breaking 1 - 7 random bubbles 

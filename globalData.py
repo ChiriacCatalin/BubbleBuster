@@ -1,5 +1,18 @@
+import pygame
+pygame.font.init()
+import os
+
+
 WIDTH, HEIGHT = 550, 720
 SETTINGS_SPACE = 50
+
+GAME_WINDOW = pygame.display.set_mode((WIDTH,HEIGHT))
+pygame.display.set_caption("BubbleBuster")
+background_image = pygame.image.load(os.path.join('Assets', 'background.jpg'))
+
+SCORE_FONT = pygame.font.SysFont('comicsans', 30)
+score = [0]
+
 
 BALL_RADIUS = 25
 GRAY = (100, 100, 100)
