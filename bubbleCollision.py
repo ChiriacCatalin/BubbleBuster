@@ -30,7 +30,10 @@ def threat_collision_point(throwed_ball, i, j, color):
         print("Error:",throwed_ball, balls_center[i][j][4])
     #print("WTF", line, col)
     add_bubble_to_map(line, col, color)
-    return(line, col)
+    if line != len(balls_center):
+        return(line, col)
+    else:
+         return (-1,-1)
 
 
 def check_clear_position(i, j):

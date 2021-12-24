@@ -13,6 +13,9 @@ background_image = pygame.image.load(os.path.join('Assets', 'background.jpg'))
 SCORE_FONT = pygame.font.SysFont('comicsans', 30)
 score = [0]
 
+RESULT_FONT = pygame.font.SysFont('comicsans',80)
+result_text = [""]
+
 
 BALL_RADIUS = 25
 GRAY = (100, 100, 100)

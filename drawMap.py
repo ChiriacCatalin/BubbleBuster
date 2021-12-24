@@ -1,5 +1,7 @@
+from pygame.font import SysFont
 from globalData import *
 import pygame
+import time
 
 def draw_map_balls():
     for i in range(len(balls_center)):
@@ -23,6 +25,16 @@ def draw_window(throwing_bubble_rect, bubble_color, next_bubble_color):
     draw_setting_menu(throwing_bubble_rect, next_bubble_color)
     
     draw_map_balls()
+
+    if result_text[0] != "":
+        result = RESULT_FONT.render(result_text[0], 1, GREEN)
+        GAME_WINDOW.blit(result,((WIDTH - result.get_width())/2, (HEIGHT - SETTINGS_SPACE - result.get_height())/2))
+        
+
     pygame.draw.circle(GAME_WINDOW, bubble_color,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS)
     pygame.draw.circle(GAME_WINDOW, GRAY,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS,width=1)
     pygame.display.update()
+
+    if result_text[0] != "":
+        result_text[0] = ""
+        time.sleep(5)
