@@ -17,8 +17,7 @@ def generate_level_rect_grid(): # generate all the possible positions on the map
             balls_center[i][j] = [0, indent_x + 2* j * BALL_RADIUS, indent_y + 2* i * BALL_RADIUS, None, None]
         
 
-def generate_balls_map():
-    row_len = [5,6,9,10,11,10,9,6,5] # the starting map layout
+def generate_balls_map_level1(row_len):
     for i in range(len(row_len)):
         first_pos = (len(balls_center[i]) - row_len[i])//2
         for j in range (row_len[i]):
@@ -29,8 +28,9 @@ def generate_balls_map():
             balls_center[i][first_pos+j][4] = aux_rect
             available_colors.add(balls_center[i][first_pos+j][3])
 
-def reset_global_data():
+def reset_global_data(status, level):
     balls_center.clear()
     available_colors.clear()
     result_text[0] = ""
-    score[0] = 0
+    if status != 'Finnish' or level == 2:
+        score[0] = 0

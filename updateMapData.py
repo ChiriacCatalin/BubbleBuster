@@ -1,3 +1,4 @@
+from pygame.draw import polygon
 from globalData import balls_center, BALL_RADIUS, available_colors, result_text
 from score import *
 import pygame
@@ -40,7 +41,10 @@ def break_bubbles(i, j):
     if len(tail) > 2:
         delete_bubbles(tail)
         increment_score(len(tail))
-        remove_floating_bubbles()
+        balls_left = remove_floating_bubbles()
+        if balls_left == 0:
+            return 'Finnish'
+    return 'continue'
 
 
 
@@ -92,3 +96,4 @@ def remove_floating_bubbles():
     if len(to_remove) > 0:
         delete_bubbles(to_remove)
         increment_score(len(to_remove), True)
+    return len(tail)
