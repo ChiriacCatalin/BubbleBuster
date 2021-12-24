@@ -28,6 +28,7 @@ THROW_BALL = (WIDTH/2, HEIGHT-BALL_RADIUS)
 
 balls_center = []
 colors = [RED,PURPLE,CYAN,BLUE,YELLOW]
+available_colors = set()
 
 score = 0
 SCORE_FONT = pygame.font.SysFont('comicsans', 30)
@@ -39,12 +40,11 @@ score_values_for_random_color = [5, 10, 25, 50, 75, 100, 150] # score for breaki
 
 def increment_score(bubbles_destroyed, random_colors = False):
     global score
-    print(bubbles_destroyed)
+    #print(bubbles_destroyed)
     if random_colors == False:
         score += score_values_for_identical_color[min(7, bubbles_destroyed-3)] + max(0, (bubbles_destroyed - 10)) * 250
     else:
         score += score_values_for_random_color[min(6, bubbles_destroyed-1)] + max(0, (bubbles_destroyed - 7)) * 50
-    print(score)
 
 def intialize_data():
     generate_level_rect_grid()
@@ -72,6 +72,9 @@ def generate_balls_map():
             aux_rect = pygame.Rect(balls_center[i][first_pos+j][1] - BALL_RADIUS, balls_center[i][first_pos+j][2] - BALL_RADIUS, 2 * BALL_RADIUS, 2* BALL_RADIUS)
             balls_center[i][first_pos+j][4] = aux_rect
 
+            
+            available_colors.add(balls_center[i][first_pos+j][3])
+
 
 def draw_map_balls():
     for i in range(len(balls_center)):
@@ -81,12 +84,15 @@ def draw_map_balls():
                 pygame.draw.circle(GAME_WINDOW, GRAY, (balls_center[i][j][1], balls_center[i][j][2]), BALL_RADIUS,width=1)
 
 
-def draw_window(throwing_bubble_rect, bubble_color):
+def draw_window(throwing_bubble_rect, bubble_color, next_bubble_color):
     GAME_WINDOW.fill(WHITE)
     GAME_WINDOW.blit(background_image, (0,0))
+
     pygame.draw.rect(GAME_WINDOW, LIGHT_GRAY, (0,0,WIDTH, SETTINGS_SPACE))
     score_text = SCORE_FONT.render("Score: " + str(score), 1, WHITE)
     GAME_WINDOW.blit(score_text, ((WIDTH - score_text.get_width())/2, (SETTINGS_SPACE - score_text.get_height())/2))
+    pygame.draw.circle(GAME_WINDOW, next_bubble_color,(WIDTH - BALL_RADIUS * 1.2, BALL_RADIUS), BALL_RADIUS - 5)
+    pygame.draw.circle(GAME_WINDOW, GRAY,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS,width=1)
 
     draw_map_balls()
     pygame.draw.circle(GAME_WINDOW, bubble_color,(throwing_bubble_rect.x + BALL_RADIUS, throwing_bubble_rect.y+BALL_RADIUS), BALL_RADIUS)
@@ -216,9 +222,11 @@ def remove_floating_bubbles():
     neighbours_short_line = [(0,1), (0,-1), (1, 0), (1,1),(-1,0),(-1,1)]
     neighbours_long_line = [(0,1), (0,-1), (1,0),(1,-1),(-1,0),(-1,-1)] #extra checking for out of bounds
     tail = []
+    available_colors.clear()
     for i in range(len(balls_center[0])):
         if balls_center[0][i][0] == 1:
             tail.append((0,i))
+            available_colors.add(balls_center[0][i][3])
     head = 0
     while head < len(tail):
         current = tail[head]
@@ -229,6 +237,7 @@ def remove_floating_bubbles():
                 if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
                     if balls_center[new_line][new_col][0] == 1 and (new_line, new_col) not in tail: # and if they have the same color
                         tail.append((new_line, new_col))
+                        available_colors.add(balls_center[new_line][new_col][3])
         else:  # if it's a line with less bubbles
             for x in range(len(neighbours_short_line)):
                 new_line = tail[head][0] + neighbours_short_line[x][0]
@@ -236,6 +245,7 @@ def remove_floating_bubbles():
                 if new_col >= 0 and new_col < len(balls_center[new_line]): # if i'm not of bounds
                     if balls_center[new_line][new_col][0] == 1 and (new_line, new_col) not in tail: # and if they have the same color
                         tail.append((new_line, new_col))
+                        available_colors.add(balls_center[new_line][new_col][3])
         head +=1
     
     to_remove = []
@@ -245,7 +255,7 @@ def remove_floating_bubbles():
                 to_remove.append((i,j))
     if len(to_remove) > 0:
         delete_bubbles(to_remove)
-        print("to_remove", to_remove)
+        #print("to_remove", to_remove)
         increment_score(len(to_remove), True)
 
 
@@ -254,7 +264,8 @@ def main():
     intialize_data()
     clock = pygame.time.Clock()
     throwing_bubble_rect = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
-    bubble_color = random.choice(colors)
+    bubble_color = random.choice(list(available_colors))
+    next_bubble_color = random.choice(list(available_colors))
     game_running = True
     pos = (None,None)
     angle = -1
@@ -276,10 +287,11 @@ def main():
         if inserted_bubble != (0,0):
             break_bubbles(inserted_bubble[0], inserted_bubble[1])
             throwing_bubble_rect = pygame.Rect(WIDTH/2-BALL_RADIUS, HEIGHT-2*BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
-            bubble_color = random.choice(colors)
+            bubble_color = next_bubble_color
+            next_bubble_color = random.choice(list(available_colors))
             angle = -1
         
-        draw_window(throwing_bubble_rect, bubble_color)
+        draw_window(throwing_bubble_rect, bubble_color, next_bubble_color)
 
 
 
