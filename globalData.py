@@ -1,19 +1,24 @@
+"""
+This module has most of the global variables and constants, like color
+and screen size
+"""
+
 import pygame
-pygame.font.init()
 import os
+pygame.font.init()
 
 
 WIDTH, HEIGHT = 550, 720
 SETTINGS_SPACE = 50
 
-GAME_WINDOW = pygame.display.set_mode((WIDTH,HEIGHT))
+GAME_WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("BubbleBuster")
 background_image = pygame.image.load(os.path.join('Assets', 'background.jpg'))
 
 SCORE_FONT = pygame.font.SysFont('comicsans', 30)
 score = [0]
 
-RESULT_FONT = pygame.font.SysFont('comicsans',80)
+RESULT_FONT = pygame.font.SysFont('comicsans', 80)
 result_text = [""]
 
 
@@ -28,9 +33,9 @@ CYAN = (0, 255, 255)
 GREEN = (50, 190, 40)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
-colors = [RED,PURPLE,CYAN,BLUE,YELLOW]
+colors = [RED, PURPLE, CYAN, BLUE, YELLOW]
 
-BALL_VELOCIY = 10
+BALL_VELOCITY = 10
 THROW_BALL = (WIDTH/2, HEIGHT-BALL_RADIUS)
 
 balls_center = []
